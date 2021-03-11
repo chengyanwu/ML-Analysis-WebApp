@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block nav %}ML Analytics{% endblock %}
+{% block title %}ML Analytics{% endblock %}
+
+{% block content %}
+<br/>
+<div class="text-center"><h4>Welcome to Machine Learning Analytic</h4></div>
+<hr/>
+
+<!-- Upload file -->
+<div class="container">
+    <div class="row">
+        <!-- uploading new csv -->
+        <div class="col border-right">
+            <h5>Upload CSV</h5>
+            <form method="post" enctype="multipart/form-data" id="upload" >
+                {% csrf_token %}
+                <label for="id_upload_file_name">Dataset name: </label>
+                <input type="text" name="file_name" required id="id_upload_file_name"/><br><br>
+                <label  for="id_document">File: </label>
+                <input type="file" name="file_content" required id="id_document"><br><br>
+                <button type="submit" class="btn btn-primary" name='upload'>Upload file</button>
+                <b>{{ status }}</b>
+
+            </form>
+ 
+        </div>
+        <!-- existing csv -->
+        <div class="col border-right">
+            <h5>Existing CSV</h5>
+                <p class="text-muted">{{file.file_name}}
+                {% for file in f %}
+                    <form  method="POST" enctype="multipart/form-data" id="delete" action="{%url 'phase1:phase1Delete' file.id %}" >
+                    {% csrf_token %}
+                    <!-- <p>{{ file.file_name }}</p> -->
+                    <span> {{ file.file_name }}</span>
+                    {% if file.file_name %}
+                    <button class = "center" ;type="submit" style="position: absolute; right: 0; background-color:red;color:white; font-size: 10px; border-radius: 8px;
+                        left: 140px;
+                        right: 380px"; name='delete'>delete</button>
+        
+                    <br>
+                    {% endif %}
+                    </form>
+                {% endfor %}
+                </p>
+        </div>
+    </div>
+    
+</div>
+<hr/>
+
+<!-- Run Analytic html -->
+<form method="post" enctype="multipart/form-data" id='analytic'>
+    {% csrf_token %}
+    <div class="container">
+        <div class="row">
+            <!-- select dataset to work on -->
+            <div class="col">
+            <h5>Select Dataset</h5>
+            {% if files|length < 1 %}
+                <p class="text-info">Please import csv</p>
+            {% else %}
+            {% for file_name in files %}
+            <div class="myradio">
+                <label for="file_name{{ forloop.counter }}"><input id="file_name{{ forloop.counter }}" name="file_name" type="radio" value="{{ file_name }}" required> {{ file_name }}</label>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    
+        <div class="col">
+            <h5>Select Algorithm</h5>
+            {% if algorithms|length < 1 %}
+                <p class="text-info">Contact the admin to upload algorithms</p>
+            {% else %}
+            {% for algorithm in algorithms %}
+            <div class="myradio">
+                <label for="{{ algorithm }}"><input id="{{ algorithm }}" name="algorithm" type="radio" value="{{ algorithm }}" required> {{ algorithm }}</label>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    
+        </div>
+        <button type="submit" class="btn btn-primary" id='run_analytic' name='analytic'> Run Analytic</button>
+        </div>
+    </form>
+<hr/>
+
+<!-- History Analytic html -->
+<form method="post" enctype="multipart/form-data" id='history'>
+    {% csrf_token %}
+    <div class="container">
+        <div class="row">
+            <!-- select dataset to work on -->
+            <div class="col">
+                <h5>History</h5>
+                {% if history|length < 1 %}
+                <p class="text-info">No history to display</p>
+                {% else %}
+                {% for history_name in history %}
+                <div class="myradio">
+                    <label for="history_name{{ forloop.counter }}"><input id="history_name{{ forloop.counter }}" name="history_name" type="radio" value="{{ history_name }}" required> {{ history_name }}</label>
+                </div>
+{% endfor %}
+{% endif %}
+</div>
+
+
+</div>
+<button type="submit" class="btn btn-secondary" id='history_data' name='history'> view</button>
+<button type="submit" class="btn btn-danger" id='delete_history' name='delete_history'> delete</
+
+
+
+{% if result_plot %}
+<div class="text-center">
+    <center>
+        <h5>result</h5>
+        {{ result_plot | safe }}
+    </center>
+</div>
+{% endif %}
+
+{% endblock %}
+
+<!-- Prediction Result -->
